@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Credit Default Prediction Report</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.6;
+    }
+    h1, h2 {
+        margin-top: 32px;
+    }
+    figure {
+        margin: 24px 0;
+    }
+    figure img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+    }
+    figcaption {
+        font-size: 0.9rem;
+        color: #555;
+        margin-top: 6px;
+    }
+</style>
+</head>
+
+<body>
+
+<h1>Predicting Credit-Card Default: A Data-Driven Exploration</h1>
+
+<h2>1. The Decision Problem</h2>
+<p>
+Financial institutions routinely face the same fundamental question:
+<strong>"Given a customer's profile and past payment behavior, how likely are they to default next month?"</strong>
+The goal of my project was to build a model that helps answer exactly this question. 
+The model does not replace human judgment; 
+it simply provides a probability estimate based on historical patterns and offer the analysis on what influence the probability of customer default.
+</p>
+
+<h2>2. The Dataset and What It Reveals</h2>
+<p>
+I used the <a href="https://www.kaggle.com/datasets/uciml/default-of-credit-card-clients-dataset" target="_blank">UCI Default of Credit Card Clients Dataset</a>. 
+This dataset contains information on default payments, demographic factors, credit data, history of payment, and bill statements of credit card clients in Taiwan from April 2005 to September 2005. 
+Each row corresponds to a credit-card holder in Taiwan, and the target variable is whether that person defaulted on their next payment.
+</p>
+<p>
+The dataset includes demographics(gender, education level, marriage status, age), credit limit, six months of repayment history, and six months of billed and paid amounts. 
+As you can see in the below Figure 1, some features are skewed and others are categorical but encoded as numbers.
+</p>
+
+<figure>
+    <img src="img/all_features.png" alt="Distribution of All Features">
+    <figcaption style="text-align: center;"><strong>Figure 1.</strong> Distribution of All Features.</figcaption>
+</figure>
+<br>
+Besides, as the following Figure 2 and 3 depicted, some features contain large outliers.
+
+<div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+    <figure style="flex: 1; min-width: 300px;">
+        <img src="img/outliers1.png" alt="LIMIT_BAL Outliers">
+        <figcaption style="text-align: center;"><strong>Figure 2.</strong> Outliers in amount of given credit in NT dollars (includes individual and family/supplementary credit)</figcaption>
+    </figure>
+    
+    <figure style="flex: 1; min-width: 300px;">
+        <img src="img/outliers2.png" alt="PAY_AMT1 Outliers">
+        <figcaption style="text-align: center;"><strong>Figure 3.</strong> Outliers in amount of previous payment in September, 2005 (NT dollar)</figcaption>
+    </figure>
+</div>
+
+<h2>3. The Modeling Approach</h2>
+<p>
+    <!-- I built and compared several prediction models, from simple benchmarks to advanced algorithms. 
+    Their core difference is how they determine which factors in the data matter most. 
+    To ensure a fair comparison on our specific problem, 
+    I evaluated them with a specialized accuracy score (ROC-AUC) that measures how well they rank possibilities. -->
+Think of this like trying different search methods to find a needle in a haystack. 
+I used a few different "search strategies": a very basic guess (dummy classifier), a straightforward checklist method (logistic regression), 
+and two more advanced, pattern-recognition techniques (random forest and gradient boosting models).
+Each strategy searches for the important "needle" (the answer to our question) in a different way. 
+I then rated each search method on how accurately it could point to where the needles actually are.
+</p>
+
+<h2>4. What the Models Found</h2>
+<p>
+The strongest model clearly outperformed the baseline methods. 
+Although the validation scores were slightly higher than the test results, 
+the final model still meaningfully distinguishes between higher-risk and lower-risk customers.
+</p>
+<p>
+Across all models, several themes were consistent:
+</p>
+<ul>
+    <li>Repayment history was the strongest predictor.</li>
+    <li>Bill amounts and payment patterns contributed additional signal.</li>
+    <li>Demographics helped modestly but were not decisive.</li>
+    </ul>
+    Take a look at the below SHAP graph (Figure 4) and you can see what features matter most for deciding customers' default.
+        <figure>
+            <img src="img/feature_value.png" alt="SHAP Feature Value Summary">
+            <figcaption style="text-align: center;"><strong>Figure 4.</strong> Ranking of the importance of all features in final model.</figcaption>
+        </figure>
+
+<h2>5. Why These Results Are Interesting</h2>
+<p>
+Even with limited information (no credit scores or employment history), the model achieved strong ranking performance. 
+This shows how much predictive structure exists in transactional behavior alone. 
+It also highlights that demographic variables, while somewhat informative, play a relatively minor role compared to repayment patterns.
+</p>
+
+<h2>6. Caveats</h2>
+<p>
+Despite promising results, several issues limit reliability:
+</p>
+<ul>
+    <li><strong>Old and narrow dataset.</strong> 
+        I create new features by averaging the six months of billed and paid amounts seperately. 
+        However, the data represents one bank in Taiwan in 2005. 
+        Customer behavior and credit systems have changed since then and this averaging may not make any sense anymore.</li>
+    <li><strong>Messy categorical fields.</strong> 
+        Variables such as EDUCATION contain improper codes
+        <a href="https://www.kaggle.com/datasets/uciml/default-of-credit-card-clients-dataset" target="_blank">(4 = others, 5 = unknown, 6 = unknown)</a>
+        that do not match expected education levels. This may potentially misleading the models 
+        because I do not do data cleaning on this feature to remove the duplicate unknown.
+    </li>
+    <li><strong>Extreme outliers.</strong> 
+        My final model is tree-based. 
+        However, there is a small number of very large bill amounts may cause tree-based models to overweight rare cases, 
+        contributing to validation–test mismatch.</li>
+</ul>
+
+<h2>7. Final Thoughts</h2>
+<p>
+The model performs well for a dataset of this nature and provides a useful starting point for risk prioritization. 
+However, due to data quality issues, age of the dataset, and hints of overfitting, 
+it should be treated as an exploration rather than a deployment-ready system.
+</p>
+</body>
+</html>
