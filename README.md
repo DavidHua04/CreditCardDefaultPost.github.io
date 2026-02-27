@@ -2,7 +2,7 @@
 
 A machine learning project that predicts the probability of credit card default using historical payment behavior and demographic data.
 
-**Live report:** [GitHub Pages site](https://CreditCardDefaultPost.github.io)
+**Live report:** [GitHub Pages site](https://davidhua04.github.io/CreditCardDefaultPost.github.io/)
 
 ---
 
